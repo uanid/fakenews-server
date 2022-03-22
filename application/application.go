@@ -7,6 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/uanid/fakenews-server/controllers"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type App struct {
@@ -14,7 +16,7 @@ type App struct {
 	port int
 }
 
-func NewApplication(port int) *App {
+func NewApplication(port int) (*App,error) {
 	app := &App{}
 	app.fiberApp = fiber.New()
 	app.fiberApp.Use(requestid.New(), logger.New(), cors.New())
