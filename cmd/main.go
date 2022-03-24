@@ -11,8 +11,12 @@ func main() {
 	port := flag.Int("port", 8080, "Rest Api Server Port")
 	flag.Parse()
 
-	app := application.NewApplication(*port)
-	err := app.Start()
+	app, err := application.NewApplication(*port)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = app.Start()
 	if err != nil {
 		log.Fatalln(err)
 	}

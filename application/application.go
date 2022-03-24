@@ -24,7 +24,7 @@ func NewApplication(port int) (*App,error) {
 	app.registerControllers()
 
 	app.port = port
-	return app
+	return app, nil
 }
 
 func (a *App) registerControllers() {
