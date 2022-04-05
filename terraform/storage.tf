@@ -24,3 +24,9 @@ resource "aws_sqs_queue" "fnc-queue" {
   message_retention_seconds  = 86400 #24시간
   max_message_size           = 2048  #2KB
 }
+
+resource "aws_ecr_repository" "fnc-ecr" {
+  name = "${local.project_name}-server"
+
+  image_tag_mutability = "IMMUTABLE"
+}
