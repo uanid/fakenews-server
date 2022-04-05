@@ -17,3 +17,5 @@
 .idea/
 
 **/.terraform
+
+dist/

@@ -1,0 +1,33 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: fakenews-server
+    main: cmd/main.go
+    binary: fakenews-server
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: linux
+        goarch: arm64
+      - goos: windows
+        goarch: arm64
+dockers:
+  - id: fakenews-server-docker
+    goos: linux
+    goarch: amd64
+    ids:
+      - fakenews-server
+    image_templates:
+      - "031804216199.dkr.ecr.ap-northeast-2.amazonaws.com/fnc-1-server:{{ .Version }}"
+    skip_push: false
+    dockerfile: Dockerfile
