@@ -2,8 +2,8 @@ resource "aws_dynamodb_table" "fnc-database" {
   name = "fnc1-db"
 
   billing_mode   = "PROVISIONED"
-  read_capacity  = 5
-  write_capacity = 5
+  read_capacity  = 2
+  write_capacity = 2
 
   hash_key = "Key"
 
