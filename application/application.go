@@ -64,6 +64,7 @@ func (a *App) registerControllers() {
 	a.fiberApp.Get("/api/v1/ping", controllers.Ping)
 	a.fiberApp.Post("/api/v1/fakenews-analyze", controllers.RequestAnalyze)
 	a.fiberApp.Get("/api/v1/fakenews-analyze/:id", controllers.GetAnalyze)
+	a.fiberApp.Get("/api/v1/fakenews-analyze", controllers.ListAnalyze)
 }
 
 func (a *App) Start() error {
