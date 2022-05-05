@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket  = "fnc-tfstates"
-    key     = "fakenews-server/generic.tfstate"
+    key     = "fakenews-server/users.tfstate"
     region  = "ap-northeast-2"
     profile = "fnc"
   }
@@ -14,10 +14,6 @@ terraform {
   }
 }
 
-locals {
-  project_name = "fnc-1"
-}
-
 provider "aws" {
   region  = "ap-northeast-2"
   profile = "fnc"
@@ -28,7 +24,4 @@ provider "aws" {
       Owner   = "musong"
     }
   }
-}
-
-data "aws_caller_identity" "current" {
 }
