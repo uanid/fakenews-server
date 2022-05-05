@@ -1,4 +1,4 @@
-package controllers
+package rest
 
 import (
 	"net/http"
@@ -8,17 +8,19 @@ import (
 	"github.com/uanid/fakenews-server/pkg/types"
 )
 
-var requestSvc *services.RequestService
-
-func SetRequestSvc(svc *services.RequestService) {
-	requestSvc = svc
+type Controller struct {
+	requestSvc *services.RequestService
 }
 
-func Ping(c *fiber.Ctx) error {
+func NewRestController(requestSvc *services.RequestService) *Controller {
+	return &Controller{requestSvc: requestSvc}
+}
+
+func (ctrl *Controller) Ping(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).SendString("Pong")
 }
 
-func RequestAnalyze(c *fiber.Ctx) error {
+func (ctrl *Controller) RequestAnalyze(c *fiber.Ctx) error {
 	req := &types.FakeNewsReq{}
 	err := c.BodyParser(req)
 	if err != nil {
@@ -29,28 +31,28 @@ func RequestAnalyze(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).SendString("Http Body is not Matched Fakenews Request Scheme")
 	}
 
-	uuid, err := requestSvc.CreateAnalyze(c.Context(), req)
+	uuid, err := ctrl.requestSvc.CreateAnalyze(c.Context(), req)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.Status(http.StatusOK).SendString(uuid)
 }
 
-func GetAnalyze(c *fiber.Ctx) error {
+func (ctrl *Controller) GetAnalyze(c *fiber.Ctx) error {
 	requestId := c.Params("id", "")
 	if requestId == "" {
 		return c.Status(http.StatusBadRequest).SendString("Id Should no be empty")
 	}
 
-	request, err := requestSvc.GetRequest(c.Context(), requestId)
+	request, err := ctrl.requestSvc.GetRequest(c.Context(), requestId)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.Status(http.StatusOK).JSON(request)
 }
 
-func ListAnalyze(c *fiber.Ctx) error {
-	requests, err := requestSvc.ListRequests(c.Context())
+func (ctrl *Controller) ListAnalyze(c *fiber.Ctx) error {
+	requests, err := ctrl.requestSvc.ListRequests(c.Context())
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
