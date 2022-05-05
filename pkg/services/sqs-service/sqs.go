@@ -16,11 +16,10 @@ type Service struct {
 	sqsQueueUrl string
 }
 
-func NewService(cfg aws.Config, sqsQueueUrl string) *Service {
-	return &Service{
-		sqsClient:   sqs.NewFromConfig(cfg),
-		sqsQueueUrl: sqsQueueUrl,
-	}
+func NewService(cfg aws.Config, sqsQueueUrl string, region string) *Service {
+	copiedCfg := cfg.Copy()
+	copiedCfg.Region = region
+	return &Service{sqsClient: sqs.NewFromConfig(copiedCfg), sqsQueueUrl: sqsQueueUrl}
 }
 
 func (s *Service) PollUuid(ctx context.Context) (string, bool, error) {

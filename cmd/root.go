@@ -21,14 +21,8 @@ func Execute() {
 	}
 }
 
-var ddbTableName string
-var sqsUrl string
-var awsProfile string
-var awsRegion string
+var configPath string
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&ddbTableName, "ddb", "fnc1-db", "Dynamodb Table Name")
-	rootCmd.PersistentFlags().StringVar(&sqsUrl, "sqs", "https://sqs.ap-northeast-2.amazonaws.com/031804216199/fnc1-queue.fifo", "Full SQS Queue Url")
-	rootCmd.PersistentFlags().StringVar(&awsProfile, "profile", "fnc", "AWS Shared Credential Profile Name")
-	rootCmd.PersistentFlags().StringVar(&awsRegion, "region", "ap-northeast-2", "AWS Region Name")
+	rootCmd.PersistentFlags().StringVar(&configPath, "config", "./config.yaml", "Application config file")
 }

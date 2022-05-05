@@ -2,6 +2,7 @@ package fnc_server
 
 import (
 	"fmt"
+	"github.com/uanid/fakenews-server/application/configs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -23,12 +24,12 @@ type App struct {
 	requestSvc *services.RequestService
 }
 
-func NewApplication(port int, ddbName string, sqsUrl string, profile string, region string) (*App, error) {
+func NewApplication(port int, cfg *configs.FncConfig) (*App, error) {
 	app := &App{}
 	app.fiberApp = fiber.New()
 	app.fiberApp.Use(requestid.New(), logger.New(), cors.New())
 
-	err := app.registerServices(ddbName, sqsUrl, profile, region)
+	err := app.registerServices(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -38,14 +39,14 @@ func NewApplication(port int, ddbName string, sqsUrl string, profile string, reg
 	return app, nil
 }
 
-func (a *App) registerServices(ddbName string, sqsUrl string, profile string, region string) error {
-	cfg, err := aws_service.NewConfig(profile, region)
+func (a *App) registerServices(cfg *configs.FncConfig) error {
+	awsCfg, err := aws_service.NewConfig(cfg.Credentials.ToAwsServiceOption())
 	if err != nil {
 		return err
 	}
 
-	ddbService := ddb_service.NewService(*cfg, ddbName)
-	sqsService := sqs_service.NewService(*cfg, sqsUrl)
+	ddbService := ddb_service.NewService(*awsCfg, cfg.DynamoDBTable, cfg.DynamoDBRegion)
+	sqsService := sqs_service.NewService(*awsCfg, cfg.SqsUrl, cfg.SqsRegion)
 
 	a.requestSvc = services.NewRequestService(ddbService, sqsService)
 	return nil

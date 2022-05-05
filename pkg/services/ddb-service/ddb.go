@@ -16,8 +16,10 @@ type Service struct {
 	ddbTableName string
 }
 
-func NewService(cfg aws.Config, ddbTableName string) *Service {
-	return &Service{ddbClient: dynamodb.NewFromConfig(cfg), ddbTableName: ddbTableName}
+func NewService(cfg aws.Config, ddbTableName string, region string) *Service {
+	copiedCfg := cfg.Copy()
+	copiedCfg.Region = region
+	return &Service{ddbClient: dynamodb.NewFromConfig(copiedCfg), ddbTableName: ddbTableName}
 }
 
 func (s *Service) CreateItem(ctx context.Context, req *types.AnalyzeRequest) error {

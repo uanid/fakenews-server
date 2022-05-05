@@ -1,0 +1,7 @@
+dynamoDBTable: fnc1-db
+dynamoDBRegion: ap-northeast-2
+sqsUrl: https://sqs.ap-northeast-2.amazonaws.com/031804216199/fnc1-queue.fifo
+sqsRegion: ap-northeast-2
+credentials:
+  profile: fnc
+  stsRegion: ap-northeast-2

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/uanid/fakenews-server/application/configs"
 
 	"github.com/spf13/cobra"
 	"github.com/uanid/fakenews-server/application/fnc_server"
@@ -17,7 +18,12 @@ func init() {
 	serverCmd.Flags().IntVar(&port, "port", 8080, "Rest Api Server Port")
 
 	serverCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := fnc_server.NewApplication(port, ddbTableName, sqsUrl, awsProfile, awsRegion)
+		cfg, err := configs.LoadConfig(configPath)
+		if err != nil {
+			return err
+		}
+
+		app, err := fnc_server.NewApplication(port, cfg)
 		if err != nil {
 			return fmt.Errorf("ApplicationInitFailed: %s", err.Error())
 		}

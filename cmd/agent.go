@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/uanid/fakenews-server/application/configs"
 	"os"
 	"os/signal"
 	"strings"
@@ -25,7 +26,12 @@ func init() {
 	agentCmd.Flags().BoolVar(&runOnce, "once", false, "Flag for not Loop Iteration")
 
 	agentCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := fnc_agent.NewApplication(ddbTableName, sqsUrl, awsProfile, awsRegion)
+		cfg, err := configs.LoadConfig(configPath)
+		if err != nil {
+			return err
+		}
+
+		app, err := fnc_agent.NewApplication(cfg)
 		if err != nil {
 			return fmt.Errorf("AgentInitFailed: %s", err.Error())
 		}

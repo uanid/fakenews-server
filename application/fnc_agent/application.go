@@ -2,6 +2,7 @@ package fnc_agent
 
 import (
 	"context"
+	"github.com/uanid/fakenews-server/application/configs"
 	"time"
 
 	"github.com/uanid/fakenews-server/controllers/agent"
@@ -18,10 +19,10 @@ type App struct {
 	ddbService   *ddb_service.Service
 }
 
-func NewApplication(ddbName string, sqsUrl string, profile string, region string) (*App, error) {
+func NewApplication(cfg *configs.FncConfig) (*App, error) {
 	app := &App{}
 
-	err := app.registerServices(ddbName, sqsUrl, profile, region)
+	err := app.registerServices(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -31,13 +32,13 @@ func NewApplication(ddbName string, sqsUrl string, profile string, region string
 	return app, nil
 }
 
-func (a *App) registerServices(ddbName string, sqsUrl string, profile string, region string) error {
-	cfg, err := aws_service.NewConfig(profile, region)
+func (a *App) registerServices(cfg *configs.FncConfig) error {
+	awsCfg, err := aws_service.NewConfig(cfg.Credentials.ToAwsServiceOption())
 	if err != nil {
 		return err
 	}
-	a.ddbService = ddb_service.NewService(*cfg, ddbName)
-	sqsService := sqs_service.NewService(*cfg, sqsUrl)
+	a.ddbService = ddb_service.NewService(*awsCfg, cfg.DynamoDBTable, cfg.DynamoDBRegion)
+	sqsService := sqs_service.NewService(*awsCfg, cfg.SqsUrl, cfg.SqsRegion)
 
 	a.agentService = services.NewAgentService(a.ddbService, sqsService)
 	return nil
