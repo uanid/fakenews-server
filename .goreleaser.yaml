@@ -3,7 +3,7 @@ before:
     - go mod tidy
 builds:
   - id: fakenews-server
-    main: cmd/main.go
+    main: main.go
     binary: fakenews-server
     env:
       - CGO_ENABLED=0
