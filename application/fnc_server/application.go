@@ -12,8 +12,6 @@ import (
 	aws_service "github.com/uanid/fakenews-server/pkg/services/aws-service"
 	ddb_service "github.com/uanid/fakenews-server/pkg/services/ddb-service"
 	sqs_service "github.com/uanid/fakenews-server/pkg/services/sqs-service"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type App struct {

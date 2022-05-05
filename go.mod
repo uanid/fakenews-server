@@ -9,7 +9,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.3
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.18.3
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.3
-	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofiber/fiber/v2 v2.30.0
 	github.com/google/uuid v1.3.0
 	github.com/spf13/cobra v1.4.0
