@@ -17,7 +17,7 @@ func init() {
 	serverCmd.Flags().IntVar(&port, "port", 8080, "Rest Api Server Port")
 
 	serverCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := fnc_server.NewApplication(port, ddbTableName, sqsUrl)
+		app, err := fnc_server.NewApplication(port, ddbTableName, sqsUrl, awsProfile, awsRegion)
 		if err != nil {
 			return fmt.Errorf("ApplicationInitFailed: %s", err.Error())
 		}

@@ -25,7 +25,7 @@ func init() {
 	agentCmd.Flags().BoolVar(&runOnce, "once", false, "Flag for not Loop Iteration")
 
 	agentCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := fnc_agent.NewApplication(ddbTableName, sqsUrl)
+		app, err := fnc_agent.NewApplication(ddbTableName, sqsUrl, awsProfile, awsRegion)
 		if err != nil {
 			return fmt.Errorf("AgentInitFailed: %s", err.Error())
 		}

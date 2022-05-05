@@ -1,18 +1,15 @@
 package fnc_server
 
 import (
-	"context"
 	"fmt"
-	"log"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/uanid/fakenews-server/controllers/rest"
 	"github.com/uanid/fakenews-server/pkg/services"
+	aws_service "github.com/uanid/fakenews-server/pkg/services/aws-service"
 	ddb_service "github.com/uanid/fakenews-server/pkg/services/ddb-service"
 	sqs_service "github.com/uanid/fakenews-server/pkg/services/sqs-service"
 
@@ -28,12 +25,12 @@ type App struct {
 	requestSvc *services.RequestService
 }
 
-func NewApplication(port int, ddbName string, sqsUrl string) (*App, error) {
+func NewApplication(port int, ddbName string, sqsUrl string, profile string, region string) (*App, error) {
 	app := &App{}
 	app.fiberApp = fiber.New()
 	app.fiberApp.Use(requestid.New(), logger.New(), cors.New())
 
-	err := app.registerServices(ddbName, sqsUrl)
+	err := app.registerServices(ddbName, sqsUrl, profile, region)
 	if err != nil {
 		return nil, err
 	}
@@ -43,21 +40,14 @@ func NewApplication(port int, ddbName string, sqsUrl string) (*App, error) {
 	return app, nil
 }
 
-func (a *App) registerServices(ddbName string, sqsUrl string) error {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("fnc"), config.WithRegion("ap-northeast-2"))
+func (a *App) registerServices(ddbName string, sqsUrl string, profile string, region string) error {
+	cfg, err := aws_service.NewConfig(profile, region)
 	if err != nil {
 		return err
 	}
 
-	stsClient := sts.NewFromConfig(cfg)
-	stsOut, err := stsClient.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Printf("account=%+v, iamarn=%+v\n", *stsOut.Account, *stsOut.Arn)
-
-	ddbService := ddb_service.NewService(cfg, ddbName)
-	sqsService := sqs_service.NewService(cfg, sqsUrl)
+	ddbService := ddb_service.NewService(*cfg, ddbName)
+	sqsService := sqs_service.NewService(*cfg, sqsUrl)
 
 	a.requestSvc = services.NewRequestService(ddbService, sqsService)
 	return nil
