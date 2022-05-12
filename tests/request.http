@@ -3,8 +3,7 @@ Content-Type: application/json
 
 {
   "title": "aaa",
-  "body": "bbbb",
-  "category": 2
+  "body": "bbbb"
 }
 ###
 
