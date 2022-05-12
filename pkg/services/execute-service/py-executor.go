@@ -74,6 +74,12 @@ func ReadOutputFile2(fileName string) (string, error) {
 	return string(buf), nil
 }
 
+func CleanupFiles(fileNames ...string) {
+	for _, fileName := range fileNames {
+		_ = os.Remove(fileName)
+	}
+}
+
 func Execute(ctx context.Context, bin string, args ...string) (stdout string, stderr string, exit int, err error) {
 	exit = 0
 

@@ -48,6 +48,7 @@ func (s *AgentService) RunCore(ctx context.Context, req *types.AnalyzeRequest) (
 	}
 	outputFile := execute_service.GenerateOutputFileName()
 	wordsLen := 5
+	defer execute_service.CleanupFiles(inputFile, outputFile)
 
 	stdout, stderr, exitCode, err := execute_service.Execute(ctx, "python3", "FNdwithjson.py", inputFile, outputFile, strconv.Itoa(wordsLen))
 	if err != nil {
