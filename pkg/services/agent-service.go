@@ -1,15 +1,12 @@
 package services
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"strings"
-	"syscall"
+	"strconv"
 
 	ddb_service "github.com/uanid/fakenews-server/pkg/services/ddb-service"
+	execute_service "github.com/uanid/fakenews-server/pkg/services/execute-service"
 	sqs_service "github.com/uanid/fakenews-server/pkg/services/sqs-service"
 	"github.com/uanid/fakenews-server/pkg/types"
 )
@@ -42,15 +39,22 @@ func (s *AgentService) PollRequest(ctx context.Context) (*types.AnalyzeRequest, 
 	return req, true, nil
 }
 
-func (s *AgentService) RunCore(ctx context.Context, req *types.AnalyzeRequest) (types.AnalyzeResult, error) {
+func (s *AgentService) RunCore(ctx context.Context, req *types.AnalyzeRequest) (string, error) {
 	fmt.Printf("[Core] Execute Command...\n")
 
-	stdout, stderr, exitCode, err := execute(ctx, "python3", "--help")
+	inputFile, err := execute_service.WriteInputFile(req.FakeNews)
 	if err != nil {
-		return types.Error, err
+		return "", err
+	}
+	outputFile := execute_service.GenerateOutputFileName()
+	wordsLen := 5
+
+	stdout, stderr, exitCode, err := execute_service.Execute(ctx, "python3", "FNdwithjson.py", inputFile, outputFile, strconv.Itoa(wordsLen))
+	if err != nil {
+		return "", err
 	}
 	if exitCode != 0 {
-		return types.Error, fmt.Errorf("UnexpectedExitcode: exitcode is not 0, %d", exitCode)
+		return "", fmt.Errorf("UnexpectedExitcode: exitcode is not 0, %d", exitCode)
 	}
 
 	if stdout != "" {
@@ -61,43 +65,11 @@ func (s *AgentService) RunCore(ctx context.Context, req *types.AnalyzeRequest) (
 		fmt.Println("[Stderr] " + stderr)
 	}
 
-	var result types.AnalyzeResult
-	if strings.Contains(stdout, "") {
-		result = types.TruthNews
-	} else {
-		result = types.FakeNews
+	result, err := execute_service.ReadOutputFile2(outputFile)
+	if err != nil {
+		return "", err
 	}
 
-	fmt.Printf("[Core] Execute Finished result=%d\n", int(result))
+	fmt.Printf("[Core] Execute Finished result=%s\n", result)
 	return result, nil
-}
-
-func execute(ctx context.Context, bin string, args ...string) (stdout string, stderr string, exit int, err error) {
-	exit = 0
-
-	cmd := exec.CommandContext(ctx, bin, args...)
-	var bufOut bytes.Buffer
-	var bufErr bytes.Buffer
-	cmd.Stdout = &bufOut
-	cmd.Stderr = &bufErr
-
-	cmdErr := cmd.Run()
-	if cmdErr != nil {
-		if exiterr, ok := cmdErr.(*exec.ExitError); ok {
-			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				exit = status.ExitStatus()
-			} else {
-				err = fmt.Errorf("ExitError: %s", cmdErr.Error())
-			}
-		} else if exiterr2, ok := cmdErr.(*exec.Error); ok {
-			err = fmt.Errorf("ExecError: PATH=%s, %s", os.Getenv("PATH"), exiterr2.Error())
-		} else {
-			err = fmt.Errorf("ExecUnknownError: %s", cmdErr.Error())
-		}
-	}
-
-	stdout = bufOut.String()
-	stderr = bufErr.String()
-	fmt.Printf("Command execute: %s %v, exitcode: %d\n", bin, args, exit)
-	return
 }

@@ -27,7 +27,7 @@ func (ctrl *Controller) RequestAnalyze(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).SendString("Invalid Request Struct")
 	}
 
-	if req.Title == "" || req.Body == "" || req.Category < 0 || req.Category > 10 {
+	if req.Title == "" || req.Body == "" {
 		return c.Status(http.StatusBadRequest).SendString("Http Body is not Matched Fakenews Request Scheme")
 	}
 

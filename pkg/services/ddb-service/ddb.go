@@ -109,7 +109,7 @@ func (s *Service) UpdateStatus(ctx context.Context, uuid string, status types.An
 	return nil
 }
 
-func (s *Service) UpdateResultWithStatus(ctx context.Context, uuid string, result types.AnalyzeResult) error {
+func (s *Service) UpdateResultWithStatus(ctx context.Context, uuid string, result string) error {
 	_, err := s.ddbClient.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		Key: map[string]ddbTypes.AttributeValue{
 			"Key": &ddbTypes.AttributeValueMemberS{Value: uuid},
@@ -124,8 +124,8 @@ func (s *Service) UpdateResultWithStatus(ctx context.Context, uuid string, resul
 			},
 			"Result": {
 				Action: ddbTypes.AttributeActionPut,
-				Value: &ddbTypes.AttributeValueMemberN{
-					Value: fmt.Sprintf("%d", int(result)),
+				Value: &ddbTypes.AttributeValueMemberS{
+					Value: result,
 				},
 			},
 		},

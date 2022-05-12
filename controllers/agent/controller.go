@@ -46,7 +46,7 @@ func (c *Controller) RunOnce(ctx context.Context) error {
 		fmt.Printf("[Agent] Nothing Polled, Stop RunOnce\n")
 		return nil
 	}
-	fmt.Printf("[Agent] Poll Success uuid=%s\n", req.Uuid)
+	fmt.Printf("[Agent] Poll Success uuid='%s'\n", req.Uuid)
 
 	err = c.ddbService.UpdateStatus(ctx, req.Uuid, types.Started)
 	if err != nil {
@@ -55,13 +55,17 @@ func (c *Controller) RunOnce(ctx context.Context) error {
 
 	fmt.Printf("[Agent] Start Run Core Program uuid=%s\n", req.Uuid)
 	result, err := c.agentService.RunCore(ctx, req)
-	if err != nil {
-		fmt.Printf("[Agent] ErrorOccured while run core: %s", err.Error())
-	}
-
-	err = c.ddbService.UpdateResultWithStatus(ctx, req.Uuid, result)
-	if err != nil {
-		return fmt.Errorf("UpdateStatusFailed: uuid=%s, %s", req.Uuid, err.Error())
+	if err == nil {
+		err = c.ddbService.UpdateResultWithStatus(ctx, req.Uuid, result)
+		if err != nil {
+			return fmt.Errorf("UpdateStatusFailed: uuid=%s, %s", req.Uuid, err.Error())
+		}
+	} else {
+		fmt.Printf("[Agent] ErrorOccured while run core: %s\n", err.Error())
+		err = c.ddbService.UpdateStatus(ctx, req.Uuid, types.Errored)
+		if err != nil {
+			return fmt.Errorf("UpdateStatusFailed: uuid=%s, %s", req.Uuid, err.Error())
+		}
 	}
 	fmt.Printf("[Agent] Finished RunOnce uuid=%s\n", req.Uuid)
 	return nil

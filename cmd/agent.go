@@ -3,12 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/uanid/fakenews-server/application/configs"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/uanid/fakenews-server/application/configs"
 
 	"github.com/spf13/cobra"
 	"github.com/uanid/fakenews-server/application/fnc_agent"
@@ -22,7 +23,7 @@ func init() {
 
 	var interval time.Duration
 	var runOnce bool
-	agentCmd.Flags().DurationVar(&interval, "interval", time.Duration(10)*time.Second, "The Agent Work Iteration Loop Interval")
+	agentCmd.Flags().DurationVar(&interval, "interval", time.Duration(5)*time.Second, "The Agent Work Iteration Loop Interval")
 	agentCmd.Flags().BoolVar(&runOnce, "once", false, "Flag for not Loop Iteration")
 
 	agentCmd.RunE = func(cmd *cobra.Command, args []string) error {

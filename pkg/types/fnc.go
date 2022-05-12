@@ -1,9 +1,8 @@
 package types
 
 type FakeNewsReq struct {
-	Title    string `json:"title"`
-	Body     string `json:"body"`
-	Category int    `json:"category"`
+	Title string `json:"title"`
+	Body  string `json:"body"`
 }
 
 type AnalyzeStatus int
@@ -12,20 +11,12 @@ const (
 	Waiting AnalyzeStatus = iota + 1
 	Started
 	Finished
-)
-
-type AnalyzeResult int
-
-const (
-	None AnalyzeResult = iota + 1
-	Error
-	FakeNews
-	TruthNews
+	Errored
 )
 
 type AnalyzeRequest struct {
-	FakeNews *FakeNewsReq  `dynamodbav:"Fakenews"`
-	Uuid     string        `dynamodbav:"Key"`
-	Status   AnalyzeStatus `dynamodbav:"Status,int"`
-	Result   AnalyzeResult `dynamodbav:"Result,int"`
+	Uuid     string        `json:"uuid" dynamodbav:"Key"`
+	FakeNews *FakeNewsReq  `json:"fakeNews" dynamodbav:"Fakenews"`
+	Status   AnalyzeStatus `json:"status" dynamodbav:"Status,int"`
+	Result   string        `json:"result" dynamodbav:"Result"`
 }
