@@ -106,6 +106,8 @@ func Execute(ctx context.Context, bin string, args ...string) (stdout string, st
 
 	stdout = bufOut.String()
 	stderr = bufErr.String()
-	fmt.Printf("Command execute: %s %v, exitcode: %d\n", bin, args, exit)
+
+	wd, err := os.Getwd()
+	fmt.Printf("Command execute: %s %v, workdir: %s, exitcode: %d\n", bin, args, wd, exit)
 	return
 }

@@ -51,19 +51,18 @@ func (s *AgentService) RunCore(ctx context.Context, req *types.AnalyzeRequest) (
 	defer execute_service.CleanupFiles(inputFile, outputFile)
 
 	stdout, stderr, exitCode, err := execute_service.Execute(ctx, "python3", "FNdwithjson.py", inputFile, outputFile, strconv.Itoa(wordsLen))
+	if stdout != "" {
+		fmt.Println("[Stdout] " + stdout)
+	}
+	if stderr != "" {
+		fmt.Println("[Stderr] " + stderr)
+	}
+
 	if err != nil {
 		return "", err
 	}
 	if exitCode != 0 {
 		return "", fmt.Errorf("UnexpectedExitcode: exitcode is not 0, %d", exitCode)
-	}
-
-	if stdout != "" {
-		fmt.Println("[Stdout] " + stdout)
-	}
-
-	if stderr != "" {
-		fmt.Println("[Stderr] " + stderr)
 	}
 
 	result, err := execute_service.ReadOutputFile2(outputFile)
