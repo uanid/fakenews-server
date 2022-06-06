@@ -1,0 +1,120 @@
+openapi: 3.0.1
+info:
+  title: Fakenews Analyze API
+  description: 뉴스 기사가 맥락에 맞게 쓰였는지 분석할 수 있습니다.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: uanid@outlook.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: /
+tags:
+  - name: FakeNews
+    description: FakeNews 분석 요청과 조회
+  - name: Server Health
+    description: 서버 상태 조회
+paths:
+  /api/v1/fakenews-analyze:
+    get:
+      description: List All Analyze Requests
+      tags:
+        - FakeNews
+      responses:
+        200:
+          description: Respond OK
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Parameter is not acceptable
+          content: {}
+        503:
+          description: Server internal error, such as can't load data from datasource
+          content: {}
+    post:
+      description: Request a New Fakenews Analyze
+      tags:
+        - FakeNews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  description: News Title
+                  default: ""
+                body:
+                  description: News Body
+                  default: ""
+      responses:
+        200:
+          description: Respond OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: The Analyze Request Uuid
+        400:
+          description: Parameter is not acceptable
+          content: {}
+        503:
+          description: Server internal error, such as can't load data from datasource
+          content: {}
+  /api/v1/fakenews-analyze/{id}:
+    get:
+      description: Get a specific Fakenews Analyze Status
+      tags:
+        - FakeNews
+      parameters:
+        - name: id
+          in: path
+          description: Id of Analyze Request
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Respond OK
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Parameter is not acceptable
+          content: { }
+        503:
+          description: Server internal error, such as can't load data from datasource
+          content: { }
+  /ping:
+    get:
+      description: Always respond pong
+      tags:
+        - Server Health
+      responses:
+        200:
+          description: ""
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
